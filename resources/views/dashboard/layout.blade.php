@@ -55,13 +55,7 @@
             @auth
             <div class="nav">
                 <a href="{{ route('dashboard') }}">Dashboard</a>
-                <a href="{{ route('urls.index') }}">My URLs</a>
-                @if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'admin')
-                    <a href="{{ route('invitations.index') }}">Users</a>
-                @endif
-                @if(auth()->user()->role == 'super_admin')
-                    <a href="{{ route('companies.index') }}">Companies</a>
-                @endif
+                <a href="{{ route('contact.index') }}">Contact</a>
                 <span>{{ auth()->user()->name }} 
                     <span class="badge badge-{{ auth()->user()->role === 'super_admin' ? 'super' : (auth()->user()->role === 'admin' ? 'admin' : auth()->user()->role) }}">
                         {{ ucfirst(str_replace('_', ' ', auth()->user()->role)) }}

@@ -10,6 +10,37 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public function register()
+    {
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
+        return view('auth.register');
+    }
+
+    public function registerSubmit(Request $request)
+    {
+        // Validate Data
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        // Create User
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password), // encrypt password
+            'role' => 'user',
+        ]);
+
+        // Auto login user after register (optional)
+        Auth::login($user);
+
+        return redirect()->route('dashboard')->with('success', 'Registered Successfully!');
+    }
+
     public function showLoginForm()
     {
         if (Auth::check()) {
@@ -43,5 +74,4 @@ class AuthController extends Controller
 
         return redirect()->route('login')->with('success', 'You have been logged out successfully.');
     }
-
 }

@@ -6,7 +6,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use App\Models\Company;
+use App\Models\Contact;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,12 +17,21 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
 
-        User::create([
-            'name' => 'Super Admin',
-            'email' => 'superadmin@yopmail.com',
-            'email_verified_at' => now(),
-            'password' => Hash::make('123456'),
-            'role' => 'super_admin',
+        // Create Admin
+        User::factory()->admin()->create([
+            'name' => 'Admin User',
+            'email' => 'admin@yopmail.com',
+            'password' => bcrypt('12345678'),
         ]);
+
+        // Create Normal User
+        User::factory()->create([
+            'name' => 'Normal User',
+            'email' => 'user@yopmail.com',
+            'password' => bcrypt('12345678'),
+            'role' => 'user'
+        ]);
+
+        Contact::factory()->count(10)->create();
     }
 }

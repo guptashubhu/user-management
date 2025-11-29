@@ -1,12 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\InvitationController;
-use App\Http\Controllers\ShortUrlController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,11 +20,10 @@ Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
 
-Route::get('/{shortCode}', [ShortUrlController::class, 'redirect'])->where('shortCode', '[a-zA-Z0-9]{6}')->name('url.redirect');
-Route::get('export-url', [ShortUrlController::class, 'export'])->name('export.url');
-
 Route::middleware('guest')->group(function () {
-    Route::get('login',[AuthController::class,'showLoginForm'])->name('login');
+    Route::get('register', [AuthController::class, 'register'])->name('register');
+    Route::post('/register', [AuthController::class, 'registerSubmit'])->name('register.submit');
+    Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 });
 
@@ -35,17 +31,21 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // all short URLs
-    Route::resource('urls', ShortUrlController::class)->except(['edit', 'update']);
+    /**
+     * Routes for Normal Users
+     * Users can only create contacts (optional: index)
+     */
+    Route::resource('contact', ContactController::class)
+        ->only(['index', 'create', 'store']);
 
-    // all invitation URLs
-    Route::middleware('role:super_admin,admin')->group(function () {
-        Route::resource('invitations', InvitationController::class)->only(['index', 'create', 'store']);
+
+
+    /**
+     * Admin Routes (Full Access)
+     * Admin can view, edit, update, delete contacts
+     */
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('contact', ContactController::class)
+            ->only(['show', 'edit', 'update', 'destroy']);
     });
-
-    // all compnies URLs
-    Route::middleware('role:super_admin')->group(function () {
-        Route::resource('companies', CompanyController::class)->only(['index', 'create', 'store']);
-    });
-
 });
